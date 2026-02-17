@@ -9,7 +9,8 @@
     "dev": "node server.js",
     "client": "cd client && npm run dev",
     "build": "cd client && npm run build",
-    "preview": "cd client && npm run preview"
+    "preview": "cd client && npm run preview",
+    "postinstall": "cd client && npm install && npm run build"
   },
   "keywords": [
     "smoking",
