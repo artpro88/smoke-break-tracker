@@ -12,6 +12,26 @@ function App() {
   });
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  // Keep-alive mechanism to prevent Render spindown
+  useEffect(() => {
+    const keepAlive = async () => {
+      try {
+        // Silent background call every 10 minutes to keep server active
+        await fetch('/api/stats', { method: 'GET' });
+      } catch (error) {
+        // Silently fail - this is just to keep server alive
+      }
+    };
+
+    // Initial keep-alive call
+    keepAlive();
+
+    // Set up keep-alive interval (10 minutes = 600000ms)
+    const keepAliveInterval = setInterval(keepAlive, 600000);
+
+    return () => clearInterval(keepAliveInterval);
+  }, []);
+
   useEffect(() => {
     fetchStats();
     const interval = setInterval(fetchStats, 5000); // Refresh every 5 seconds
