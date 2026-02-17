@@ -1,0 +1,30 @@
+{
+  "name": "smoke-break-tracker",
+  "version": "1.0.0",
+  "description": "A shared workplace interface to track smoking breaks and support quitting goals",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "preview": "cd client && npm run preview"
+  },
+  "keywords": [
+    "smoking",
+    "break",
+    "tracker",
+    "health",
+    "workplace"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0"
+  }
+}
+
