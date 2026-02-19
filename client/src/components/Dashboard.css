@@ -82,6 +82,9 @@
 .action-section {
   width: 100%;
   max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .smoke-button {
@@ -119,12 +122,42 @@
   opacity: 0.6;
 }
 
+.checky-button {
+  width: 100%;
+  padding: 1.2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.checky-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+}
+
+.checky-button:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.checky-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .stats-summary {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 1.5rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   margin-top: 2rem;
 }
 

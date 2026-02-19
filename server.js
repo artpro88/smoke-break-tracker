@@ -27,6 +27,7 @@ db.serialize(() => {
       timestamp INTEGER NOT NULL,
       date TEXT NOT NULL,
       week_number INTEGER NOT NULL,
+      is_early INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
@@ -63,14 +64,34 @@ app.post('/api/smoke', (req, res) => {
   const id = uuidv4();
 
   db.run(
-    `INSERT INTO smoke_logs (id, timestamp, date, week_number) VALUES (?, ?, ?, ?)`,
-    [id, now, today, weekNumber],
+    `INSERT INTO smoke_logs (id, timestamp, date, week_number, is_early) VALUES (?, ?, ?, ?, ?)`,
+    [id, now, today, weekNumber, 0],
     (err) => {
       if (err) {
         console.error('Error logging smoke:', err);
         return res.status(500).json({ error: 'Failed to log smoke break' });
       }
       res.json({ success: true, timestamp: now, id });
+    }
+  );
+});
+
+// 1b. Log an early smoke break (before 1 hour)
+app.post('/api/smoke/early', (req, res) => {
+  const now = Date.now();
+  const today = getTodayDate();
+  const weekNumber = getWeekNumber(new Date());
+  const id = uuidv4();
+
+  db.run(
+    `INSERT INTO smoke_logs (id, timestamp, date, week_number, is_early) VALUES (?, ?, ?, ?, ?)`,
+    [id, now, today, weekNumber, 1],
+    (err) => {
+      if (err) {
+        console.error('Error logging early smoke:', err);
+        return res.status(500).json({ error: 'Failed to log early smoke break' });
+      }
+      res.json({ success: true, timestamp: now, id, isEarly: true });
     }
   );
 });
@@ -166,11 +187,21 @@ app.get('/api/stats', (req, res) => {
                 return res.status(500).json({ error: 'Failed to fetch data' });
               }
 
-              res.json({
-                todayCount: todayRow.todayCount,
-                weekCount: weekRow.weekCount,
-                lastSmoke: lastRow ? lastRow.timestamp : null
-              });
+              db.get(
+                `SELECT COUNT(*) as earlyCount FROM smoke_logs WHERE is_early = 1`,
+                (err, earlyRow) => {
+                  if (err) {
+                    return res.status(500).json({ error: 'Failed to fetch data' });
+                  }
+
+                  res.json({
+                    todayCount: todayRow.todayCount,
+                    weekCount: weekRow.weekCount,
+                    lastSmoke: lastRow ? lastRow.timestamp : null,
+                    earlySmokes: earlyRow.earlyCount
+                  });
+                }
+              );
             }
           );
         }

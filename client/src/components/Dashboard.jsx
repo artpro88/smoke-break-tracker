@@ -58,7 +58,7 @@ function Dashboard({ stats, onSmokeLogged }) {
         setMessage('Cigarette logged! ✅');
         setCanSmoke(false);
         setTimeRemaining(HOUR_MS);
-        
+
         setTimeout(() => {
           onSmokeLogged();
         }, 500);
@@ -66,6 +66,30 @@ function Dashboard({ stats, onSmokeLogged }) {
     } catch (error) {
       console.error('Error logging smoke:', error);
       setMessage('❌ Failed to log cigarette');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEarlySmoke = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/smoke/early', { method: 'POST' });
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage('Early smoke logged 🚬');
+        setLastWaitTime('Timer reset to 1 hour');
+        setCanSmoke(false);
+        setTimeRemaining(HOUR_MS);
+
+        setTimeout(() => {
+          onSmokeLogged();
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error logging early smoke:', error);
+      setMessage('❌ Failed to log early smoke');
     } finally {
       setLoading(false);
     }
@@ -106,6 +130,17 @@ function Dashboard({ stats, onSmokeLogged }) {
         >
           {loading ? '⏳ Logging...' : "I'm Going for a Smoke"}
         </button>
+
+        {!canSmoke && timeRemaining > 0 && (
+          <button
+            className="checky-button"
+            onClick={handleEarlySmoke}
+            disabled={loading}
+            title="Go for a smoke before the hour is up. Timer will reset to 1 hour."
+          >
+            {loading ? '⏳ Logging...' : '🚬 Checky Cigarette'}
+          </button>
+        )}
       </div>
 
       <div className="stats-summary">
@@ -118,6 +153,11 @@ function Dashboard({ stats, onSmokeLogged }) {
           <div className="stat-label">This Week</div>
           <div className="stat-value">{stats.weekCount}</div>
           <div className="stat-unit">cigarettes</div>
+        </div>
+        <div className="stat-box">
+          <div className="stat-label">Early Smokes</div>
+          <div className="stat-value">{stats.earlySmokes || 0}</div>
+          <div className="stat-unit">total</div>
         </div>
       </div>
     </div>
